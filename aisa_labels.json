@@ -1,0 +1,59 @@
+{
+  "dataset_name": "aisa_clean_django_training_v1",
+  "description": "Clean Django repo — zero vulnerabilities. Used as negative training example for AISA ML model.",
+  "expected_risk_score": 5,
+  "expected_severity": "Low",
+  "vulnerabilities": [],
+  "fixes_applied": [
+    {
+      "fix_id": "fix_001",
+      "weakness_fixed": "missing_object_level_auth",
+      "file": "api/views.py",
+      "class": "OrderDetailView",
+      "fix": "Order.objects.get(id=id, user=request.user) + IsAuthenticated",
+      "pattern": "get_object_or_404(Order, id=id, user=request.user)"
+    },
+    {
+      "fix_id": "fix_002",
+      "weakness_fixed": "missing_authentication",
+      "file": "api/views.py",
+      "class": "OrderListView",
+      "fix": "IsAuthenticated + scoped to request.user",
+      "pattern": "Order.objects.filter(user=request.user)"
+    },
+    {
+      "fix_id": "fix_003",
+      "weakness_fixed": "serializer_data_overexposure",
+      "file": "api/serializers.py",
+      "class": "UserProfileSerializer",
+      "fix": "Explicit fields=['id','phone'] — no ssn, no token",
+      "pattern": "fields = ['id', 'phone']"
+    },
+    {
+      "fix_id": "fix_004",
+      "weakness_fixed": "mass_assignment",
+      "file": "api/views.py",
+      "class": "OrderCreateView",
+      "fix": "Separate write serializer with only [item, amount]; user set from request",
+      "pattern": "serializer.save(user=request.user)"
+    },
+    {
+      "fix_id": "fix_005",
+      "weakness_fixed": "admin_endpoint_no_permission_check",
+      "file": "api/views.py",
+      "class": "AdminUserListView",
+      "fix": "permission_classes = [IsAdminUser]",
+      "pattern": "permission_classes = [IsAdminUser]"
+    },
+    {
+      "fix_id": "fix_006",
+      "weakness_fixed": "token_reflection_no_validation",
+      "file": "api/views.py",
+      "class": "TokenInfoView",
+      "fix": "TokenAuthentication validates server-side; never echo token",
+      "pattern": "return Response({'user': request.user.username})"
+    }
+  ],
+  "attack_chains": [],
+  "ml_training_note": "This repo should produce 0 vulnerability detections. Any detection here = false positive in AISA."
+}
